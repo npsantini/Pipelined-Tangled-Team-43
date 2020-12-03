@@ -688,8 +688,8 @@ module Tangled (
     wire `WORD_SIZE aluOut;
     ALU alu(.out(aluOut), .op(psr12_aluOp), .a(psr12_rdValue), .b(psr12_rsValue));
 
-    wire `WORD_SIZE_QAT alu_Qat; 
-    QATALU qat(.out(alu_Qat),);
+    //wire `WORD_SIZE_QAT alu_Qat; 
+    //QATALU qat(.out(alu_Qat),);
 
     // Determine if a branch/jump should be taken, and if so, the target.
     // (Wires defined in stage 0).
