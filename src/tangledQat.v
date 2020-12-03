@@ -1,10 +1,4 @@
-/* Team 43
 
-
-
-
-
-*/
 
 // The following macros should be set using the -D flag when invoking iverilog
 // from the command line in order to specify testbench text and data vmem files
@@ -674,20 +668,20 @@ module Tangled (
     // Instantiate the ALU
     wire `WORD_SIZE aluOut;
     
-    wire `QAT_SIZE alu_Qat; 
+    reg `QAT_SIZE alu_Qat; 
 
-    wire a`QAT_SIZE = 0;
-    wire b`QAT_SIZE = 1;
-    wire c`QAT_SIZE = 2;
-    wire QATOP[3:0] = 0;
-    wire imm_Qat[3:0] = 0;
+    reg a[255:0]     = 0;
+    reg b[255:0]     = 1;
+    reg c[255:0]     = 2;
+    reg QATOP[3:0]   = 0;
+    reg imm_Qat[3:0] = 0;
 
     
     
     ALU alu(.out(aluOut), .op(psr12_aluOp), .a(psr12_rdValue), .b(psr12_rsValue));
 
 
-    QATALU qat(.out(alu_Qat), .a(a), .b(b), .c(c), QATOP, imm_Qat);
+    QATALU qat(alu_Qat, (a), (b), (c), QATOP, imm_Qat);
 
 
     // Determine if a branch/jump should be taken, and if so, the target.
