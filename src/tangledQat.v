@@ -1,15 +1,10 @@
-/*
-* 
-*      Authors: Cain Hubbard, Collin Lebanik, Nick Satini, Tristan Barnes
-*         File: tangled.v
-*      Project: Assignment 3 - "Pipelined Tangled"
-*      Created: 5 November 2020
-* 
-*  Description: Implements a Pipelined Tangled Processor design.
-*           
+/* Team 43
+
+
+
+
+
 */
-
-
 
 // The following macros should be set using the -D flag when invoking iverilog
 // from the command line in order to specify testbench text and data vmem files
@@ -211,37 +206,32 @@ module fneg(result, f);
 endmodule
 
 
-// *****************************************************************************
-// ******************************** QAT ALU ************************************
-// *****************************************************************************
-
-
 //need `defines for QAT instructions opcodes
     `define QAT_ALU_OP_SIZE  [12:8]
-    `define QAT_ALU_OP_AND    8h'02
-    `define QAT_ALU_OP_CCNOT  8h'00 
-    `define QAT_ALU_OP_CNOT   8h'11
-    `define QAT_ALU_OP_CSWAP  8h'02
-    `define QAT_ALU_OP_HAD    4h'60
-    `define QAT_ALU_OP_NOT    8h'02
-    `define QAT_ALU_OP_OR     8h'03
-    `define QAT_ALU_OP_ONE    8h'02
-    `define QAT_ALU_OP_SWAP   8h'10
-    `define QAT_ALU_OP_XOR    8h'04
-    `define QAT_ALU_OP_ZERO   8h'02
-    `define QAT_ALU_OP_MEAS   4h'60
-    `define QAT_ALU_OP_NEXT   4h'50 //'
+    `define QAT_ALU_OP_AND    8'h02
+    `define QAT_ALU_OP_CCNOT  8'h00 
+    `define QAT_ALU_OP_CNOT   8'h11
+    `define QAT_ALU_OP_CSWAP  8'h02
+    `define QAT_ALU_OP_HAD    4'h60
+    `define QAT_ALU_OP_NOT    8'h02
+    `define QAT_ALU_OP_OR     8'h03
+    `define QAT_ALU_OP_ONE    8'h02
+    `define QAT_ALU_OP_SWAP   8'h10
+    `define QAT_ALU_OP_XOR    8'h04
+    `define QAT_ALU_OP_ZERO   8'h02
+    `define QAT_ALU_OP_MEAS   4'h60
+    `define QAT_ALU_OP_NEXT   4'h50
 
 
     `define QAT_SIZE    [255:0]
 
 module QATALU (
-    output reg `QAT_SIZE result
+    output reg `QAT_SIZE result,
     //NEED `DEFINE FOR WHERE QAT OPCODES ARE
-    input wire signed `QAT_SIZE first
-    input wire signed `QAT_SIZE second
-    input wire signed `QAT_SIZE third
-    input wire [3:0] imm4
+    input wire signed `QAT_SIZE first,
+    input wire signed `QAT_SIZE second,
+    input wire signed `QAT_SIZE third,
+    input wire [3:0] imm4,
     input wire [3:0] Qop
 );
     always @* begin
@@ -249,35 +239,33 @@ module QATALU (
             `QAT_ALU_OP_AND: result = second & third;
             `QAT_ALU_OP_CCNOT: result = first ^ (second & third);
             `QAT_ALU_OP_CNOT: result = first ^ second;
-            `QAT_ALU_OP_CSWAP: sys; //first = ((third & second)|((~third) & first))
+            //`QAT_ALU_OP_CSWAP: sys; //first = ((third & second)|((~third) & first))
                                //second = ((third & first)|((~third) & second))
                                //need to update both registers somehow
             `QAT_ALU_OP_HAD: begin
-               case (imm4)
-
-               4'b0000: result = {128{2'h2}}
-               4'b0001: result = {64{4'hc}}
-               4'b0010: result = {32{8'hf0}}
-               4'b0011: result = {16{16'hff00}}
-               4'b0100: result = {8{32'hffff0000}}
-               4'b0101: result = {4{64'hffffffff00000000}}
-               4'b0110: result = {2{128'hffffffffffffffff0000000000000000}}
-               4'b0111: result = {1{256'hffffffffffffffffffffffffffffffff00000000000000000000000000000000}}
-               default: //Do nothing. Too big of a pattern.
-               endcase
+                case (imm4)
+                    4'b0000: result = {128{2'h2}};
+                    4'b0001: result = {64{4'hc}};
+                    4'b0010: result = {32{8'hf0}};
+                    4'b0011: result = {16{16'hff00}};
+                    4'b0100: result = {8{32'hffff0000}};
+                    4'b0101: result = {4{64'hffffffff00000000}};
+                    4'b0110: result = {2{128'hffffffffffffffff0000000000000000}};
+                    4'b0111: result = {1{256'hffffffffffffffffffffffffffffffff00000000000000000000000000000000}};
+                    default: ;//Do nothing. Too big of a pattern.
+                endcase
             end
             `QAT_ALU_OP_NOT: result = ~first;
             `QAT_ALU_OP_OR: result = second | third;
             `QAT_ALU_OP_ONE: result = 1;
-            `QAT_ALU_OP_SWAP: result = h'00; //'store first register value into temp variable set first register value to what is stored in second. 
+            `QAT_ALU_OP_SWAP: result = 'h00; //'store first register value into temp variable set first register value to what is stored in second. 
                               //set second register to temp value
                               //need to update both registers somehow
             `QAT_ALU_OP_XOR: result = second ^ third;
             `QAT_ALU_OP_ZERO: result = 0;
         endcase    
     end
-)
-
+endmodule
 
 // *****************************************************************************
 // ************************************ ALU ************************************
@@ -686,12 +674,20 @@ module Tangled (
     // Instantiate the ALU
     wire `WORD_SIZE aluOut;
     
-    wire `WORD_SIZE_QAT alu_Qat; 
+    wire `QAT_SIZE alu_Qat; 
+
+    wire a`QAT_SIZE = 0;
+    wire b`QAT_SIZE = 1;
+    wire c`QAT_SIZE = 2;
+    wire QATOP[3:0] = 0;
+    wire imm_Qat[3:0] = 0;
+
+    
     
     ALU alu(.out(aluOut), .op(psr12_aluOp), .a(psr12_rdValue), .b(psr12_rsValue));
 
 
-    QATALU qat(.out(alu_Qat),);
+    QATALU qat(.out(alu_Qat), .a(a), .b(b), .c(c), QATOP, imm_Qat);
 
 
     // Determine if a branch/jump should be taken, and if so, the target.
