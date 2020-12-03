@@ -342,7 +342,7 @@ endmodule
 `define F3_OP_CCNOT         0
 `define F3_OP_CSWAP         1
 `define F3_OP_AND           2
-`define F3_OP_OP            3
+`define F3_OP_OR            3
 `define F3_OP_XOR           4
 `define F3_OP_SWAP          16
 `define F3_OP_CNOT          17
