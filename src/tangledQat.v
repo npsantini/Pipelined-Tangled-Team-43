@@ -1,13 +1,3 @@
-// Team 43
-
-// The following macros should be set using the -D flag when invoking iverilog
-// from the command line in order to specify testbench text and data vmem files
-// and the name of the output vcd file. 
-//`define TEST_TEXT_VMEM      "set/using/the/-D/flag/on/cmdline/test.text.vmem"
-//`define TEST_DATA_VMEM      "set/using/the/-D/flag/on/cmdline/test.text.vmem"
-//`define TEST_VCD            "set/using/the/-D/flag/on/cmdline/test.vcd"
-
-
 
 // ROM used by the frecip Floaty module.
 `define FRECIP_LOOKUP_VMEM  "src/frecipLookup.vmem"
@@ -16,11 +6,10 @@
 
 // Generic Tangled word size
 `define WORD_SIZE           [15:0]
-`define WORD_SIZE_QAT       [31:0]
 `define WORD_HIGH_FIELD     [15:8]
 `define WORD_LOW_FIELD      [7:0]
 
-
+`define WORD_SIZE_QAT       [31:0]
 
 // *****************************************************************************
 // ********************************** FLOATY ***********************************
@@ -200,6 +189,12 @@ module fneg(result, f);
 endmodule
 
 
+
+// *****************************************************************************
+// ******************************** QAT ALU ************************************
+// *****************************************************************************
+
+
 //need `defines for QAT instructions opcodes
     `define QAT_ALU_OP_SIZE  [12:8]
     `define QAT_ALU_OP_AND    8'h02
@@ -214,7 +209,7 @@ endmodule
     `define QAT_ALU_OP_XOR    8'h04
     `define QAT_ALU_OP_ZERO   8'h02
     `define QAT_ALU_OP_MEAS   4'h60
-    `define QAT_ALU_OP_NEXT   4'h50
+    `define QAT_ALU_OP_NEXT   4'h50 //'
 
 
     `define QAT_SIZE    [255:0]
@@ -260,6 +255,7 @@ module QATALU (
         endcase    
     end
 endmodule
+
 
 // *****************************************************************************
 // ************************************ ALU ************************************
@@ -392,7 +388,7 @@ endmodule
 `define F3_OP_CCNOT         0
 `define F3_OP_CSWAP         1
 `define F3_OP_AND           2
-`define F3_OP_OP            3
+`define F3_OP_OR            3
 `define F3_OP_XOR           4
 `define F3_OP_SWAP          16
 `define F3_OP_CNOT          17
@@ -486,6 +482,8 @@ module Tangled (
         input `WORD_SIZE instr;
         isQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD >= `FB_FIELD_F4);
     endfunction
+
+
 
     always @(posedge clk) begin
         // It is possible that a sys/qat occurs immediately after a branch/jump,
@@ -667,22 +665,10 @@ module Tangled (
 
     // Instantiate the ALU
     wire `WORD_SIZE aluOut;
-    
-    reg `QAT_SIZE alu_Qat; 
-
-   // reg a[255:0]     = 0;
-    // reg b[255:0]     = 1; // Temp code to test calling the larger ALU
-   // reg c[255:0]     = 2;
-   // reg QATOP[3:0]   = 0;
-   // reg imm_Qat[3:0] = 0;
-
-    
-    
     ALU alu(.out(aluOut), .op(psr12_aluOp), .a(psr12_rdValue), .b(psr12_rsValue));
 
-
-    //  QATALU qat(alu_Qat, (a), (b), (c), QATOP, imm_Qat); // calling QAT 1 ALU 
-
+    //wire `WORD_SIZE_QAT alu_Qat; 
+    //QATALU qat(.out(alu_Qat),);
 
     // Determine if a branch/jump should be taken, and if so, the target.
     // (Wires defined in stage 0).
