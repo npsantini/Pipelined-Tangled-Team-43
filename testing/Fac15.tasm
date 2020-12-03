@@ -1,0 +1,108 @@
+;	Tangled factoring of 15
+;
+;	20201110 by H. Dietz
+;
+;	pint a = pint_mk(4, 15);
+;	pint b = pint_h(4, 0x0f);
+;	pint c = pint_h(4, 0xf0);
+;	pint d = pint_mul(b, c);
+;	pint e = pint_eq(d, a);
+;
+;	The entanglement channels in e that are 1 are the factors
+;	(really corresponding to b values), so just read positions...
+;
+.text
+
+	had	@0,3
+	had	@1,5
+	and	@2,@0,@1
+	had	@3,4
+	and	@4,@0,@3
+	had	@5,2
+	and	@6,@5,@1
+	and	@7,@4,@6
+	and	@8,@5,@3
+	had	@9,1
+	and	@10,@9,@1
+	and	@11,@8,@10
+	and	@12,@9,@3
+	had	@13,0
+	and	@14,@13,@1
+	and	@15,@12,@14
+	xor	@16,@8,@10
+	and	@17,@15,@16
+	or	@18,@11,@17
+	xor	@19,@4,@6
+	and	@20,@18,@19
+	or	@21,@7,@20
+	and	@22,@2,@21
+	had	@23,6
+	and	@24,@0,@23
+	and	@25,@22,@24
+	xor	@26,@2,@21
+	and	@27,@5,@23
+	and	@28,@26,@27
+	xor	@29,@18,@19
+	and	@30,@9,@23
+	and	@31,@29,@30
+	xor	@32,@15,@16
+	and	@33,@13,@23
+	and	@34,@32,@33
+	xor	@35,@29,@30
+	and	@36,@34,@35
+	or	@37,@31,@36
+	xor	@38,@26,@27
+	and	@39,@37,@38
+	or	@40,@28,@39
+	xor	@41,@22,@24
+	and	@42,@40,@41
+	or	@43,@25,@42
+	had	@44,7
+	and	@45,@0,@44
+	and	@46,@43,@45
+	xor	@47,@40,@41
+	and	@48,@5,@44
+	and	@49,@47,@48
+	xor	@50,@37,@38
+	and	@51,@9,@44
+	and	@52,@50,@51
+	xor	@53,@34,@35
+	and	@54,@13,@44
+	and	@55,@53,@54
+	xor	@56,@50,@51
+	and	@57,@55,@56
+	or	@58,@52,@57
+	xor	@59,@47,@48
+	and	@60,@58,@59
+	or	@61,@49,@60
+	xor	@62,@43,@45
+	and	@63,@61,@62
+	or	@64,@46,@63
+	xor	@65,@61,@62
+	xor	@66,@58,@59
+	xor	@67,@55,@56
+	xor	@68,@53,@54
+	xor	@69,@32,@33
+	and	@70,@13,@3
+	xor	@71,@12,@14
+	and	@72,@70,@71
+	and	@73,@69,@72
+	and	@74,@68,@73
+	or	@75,@74,@74
+	not	@75
+	or	@76,@67,@75
+	or	@77,@66,@76
+	or	@78,@65,@77
+	or	@79,@64,@78
+	or	@80,@79,@79
+	not	@80
+;
+;	@80 is e, so make $0, $2 the prime factors
+;
+	lex	$0,31	; want first factor >=(16*2)
+	next	$0,@80	; should be 5*(16*3)
+	copy	$1,$0	; want first factor >$0
+	next	$1,@80	; should be 3*(16*5)
+	lex	$2,15	; mask to actual values
+	and	$0,$2	; 5
+	and	$1,$2	; 3
