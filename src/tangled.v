@@ -30,7 +30,7 @@
 `define WORD_HIGH_FIELD     [15:8]
 `define WORD_LOW_FIELD      [7:0]
 
-
+`define WORD_SIZE_QAT       [31:0]
 
 // *****************************************************************************
 // ********************************** FLOATY ***********************************
@@ -209,6 +209,73 @@ module fneg(result, f);
     assign result = (f == `FNAN) ? `FNAN : (f ^ `FSIGN_M);
 endmodule
 
+
+
+// *****************************************************************************
+// ******************************** QAT ALU ************************************
+// *****************************************************************************
+
+
+//need `defines for QAT instructions opcodes
+    `define QAT_ALU_OP_SIZE  [12:8]
+    `define QAT_ALU_OP_AND    8'h02
+    `define QAT_ALU_OP_CCNOT  8'h00 
+    `define QAT_ALU_OP_CNOT   8'h11
+    `define QAT_ALU_OP_CSWAP  8'h02
+    `define QAT_ALU_OP_HAD    4'h60
+    `define QAT_ALU_OP_NOT    8'h02
+    `define QAT_ALU_OP_OR     8'h03
+    `define QAT_ALU_OP_ONE    8'h02
+    `define QAT_ALU_OP_SWAP   8'h10
+    `define QAT_ALU_OP_XOR    8'h04
+    `define QAT_ALU_OP_ZERO   8'h02
+    `define QAT_ALU_OP_MEAS   4'h60
+    `define QAT_ALU_OP_NEXT   4'h50 //'
+
+
+    `define QAT_SIZE    [255:0]
+
+module QATALU (
+    output reg `QAT_SIZE result,
+    //NEED `DEFINE FOR WHERE QAT OPCODES ARE
+    input wire signed `QAT_SIZE first,
+    input wire signed `QAT_SIZE second,
+    input wire signed `QAT_SIZE third,
+    input wire [3:0] imm4,
+    input wire [3:0] Qop
+);
+    always @* begin
+        case (Qop)
+            `QAT_ALU_OP_AND: result = second & third;
+            `QAT_ALU_OP_CCNOT: result = first ^ (second & third);
+            `QAT_ALU_OP_CNOT: result = first ^ second;
+            //`QAT_ALU_OP_CSWAP: sys; //first = ((third & second)|((~third) & first))
+                               //second = ((third & first)|((~third) & second))
+                               //need to update both registers somehow
+            `QAT_ALU_OP_HAD: begin
+                case (imm4)
+                    4'b0000: result = {128{2'h2}};
+                    4'b0001: result = {64{4'hc}};
+                    4'b0010: result = {32{8'hf0}};
+                    4'b0011: result = {16{16'hff00}};
+                    4'b0100: result = {8{32'hffff0000}};
+                    4'b0101: result = {4{64'hffffffff00000000}};
+                    4'b0110: result = {2{128'hffffffffffffffff0000000000000000}};
+                    4'b0111: result = {1{256'hffffffffffffffffffffffffffffffff00000000000000000000000000000000}};
+                    default: ;//Do nothing. Too big of a pattern.
+                endcase
+            end
+            `QAT_ALU_OP_NOT: result = ~first;
+            `QAT_ALU_OP_OR: result = second | third;
+            `QAT_ALU_OP_ONE: result = 1;
+            `QAT_ALU_OP_SWAP: result = 'h00; //'store first register value into temp variable set first register value to what is stored in second. 
+                              //set second register to temp value
+                              //need to update both registers somehow
+            `QAT_ALU_OP_XOR: result = second ^ third;
+            `QAT_ALU_OP_ZERO: result = 0;
+        endcase    
+    end
+endmodule
 
 
 // *****************************************************************************
@@ -434,8 +501,10 @@ module Tangled (
 
     function isQat;
         input `WORD_SIZE instr;
-        isQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD == `FB_FIELD_F4);
+        isQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD >= `FB_FIELD_F4);
     endfunction
+
+
 
     always @(posedge clk) begin
         // It is possible that a sys/qat occurs immediately after a branch/jump,
@@ -618,6 +687,9 @@ module Tangled (
     // Instantiate the ALU
     wire `WORD_SIZE aluOut;
     ALU alu(.out(aluOut), .op(psr12_aluOp), .a(psr12_rdValue), .b(psr12_rsValue));
+
+    wire `WORD_SIZE_QAT alu_Qat; 
+    QATALU qat(.out(alu_Qat),);
 
     // Determine if a branch/jump should be taken, and if so, the target.
     // (Wires defined in stage 0).
