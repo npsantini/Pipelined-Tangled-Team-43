@@ -427,9 +427,14 @@ module Tangled (
         is2WordFrmt = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD == `FB_FIELD_F3);
     endfunction
 
-    function isSysOrQat;
+    function isSys;
         input `WORD_SIZE instr;
-        isSysOrQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD != `FB_FIELD_F1);
+        isSys = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD == `FB_FIELD_F4);
+    endfunction
+
+    function isQat;
+        input `WORD_SIZE instr;
+        isQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD == `FB_FIELD_F4);
     endfunction
 
     always @(posedge clk) begin
@@ -440,8 +445,8 @@ module Tangled (
         if (!ps0_halt || shouldBrJmp) begin
             pc <= pc_eff + (is2WordFrmt(instr) ? 2 : 1);
             psr01_ir <= instr;
-            psr01_halt <= isSysOrQat(instr);
-            ps0_halt <= isSysOrQat(instr);
+            psr01_halt <= isSys(instr);
+            ps0_halt <= isSys(instr);
         end 
     end
 
