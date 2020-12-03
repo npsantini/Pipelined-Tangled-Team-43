@@ -1,0 +1,514 @@
+<<
+/* parser.dlg -- DLG Description of scanner
+ *
+ * Generated from: aik.g
+ *
+ * Terence Parr, Will Cohen, and Hank Dietz: 1989-2001
+ * Purdue University Electrical Engineering
+ * With AHPCRC, University of Minnesota
+ * ANTLR Version 1.33MR33
+ */
+
+#define ANTLR_VERSION	13333
+#include "pcctscfg.h"
+#include "pccts_stdio.h"
+
+typedef	int Attrib;
+#define zzdef0(a)		{ *(a)=0; }
+#define zzd_attr(a)		{ /* Nothing to do */ }
+#define	AST_FIELDS \
+int	sym;
+
+#define zzcr_ast(ast, attr, token_type, text)	 ast->sym = *(attr)
+
+#define	VERSION		 20191030
+#define	VERSTRING	"20191030"
+
+extern int	inbraces;
+extern FILE	*specin;
+
+#ifdef	CGI
+#include "cgic.h"
+#define	stderr	cgiOut
+#endif
+
+  
+#define LL_K 4
+#include "antlr.h"
+#include "ast.h"
+#include "tokens.h"
+#include "dlgdef.h"
+LOOKAHEAD
+
+void
+#ifdef __USE_PROTOS
+zzerraction(void)
+#else
+zzerraction()
+#endif
+{
+	(*zzerr)("invalid token");
+	zzadvance();
+	zzskip();
+}
+>>
+
+
+%%START
+
+@
+	<<
+		NLA = MYEOF;
+    zzreplstr("$EOF");   
+	>>
+
+[\ \t]+
+	<<
+		NLA = 2;
+    zzskip();   
+	>>
+
+((;(~[\n])*\n)|(\n))
+	<<
+		NLA = EOS;
+    zzline++;
+    if (inbraces) zzskip();
+	>>
+
+\{
+	<<
+		NLA = 4;
+    ++inbraces; zzskip();   
+	>>
+
+\}
+	<<
+		NLA = 5;
+    inbraces -= (inbraces != 0); zzskip();   
+	>>
+
+\'
+	<<
+		NLA = 6;
+    zzreplstr(""); zzmode(LEXSTRING); zzmore();   
+	>>
+
+\"
+	<<
+		NLA = 7;
+    zzreplstr(""); zzmode(LEXMESG); zzmore();   
+	>>
+
+(([0-9]+)|(0[bBxX][0-9A-Fa-f]+))
+	<<
+		NLA = NUM;
+    if ((*(zzbegexpr) == '0') &&
+    ((*(zzbegexpr+1) == 'b') ||
+    (*(zzbegexpr+1) == 'B'))) {
+      zzreplstr( btox(zzbegexpr) );
+    }
+	>>
+
+:=
+	<<
+		NLA = IS;
+	>>
+
+?=
+	<<
+		NLA = DEFINED;
+	>>
+
+:
+	<<
+		NLA = COLON;
+	>>
+
+?
+	<<
+		NLA = QUEST;
+	>>
+
+\|\|
+	<<
+		NLA = OROR;
+	>>
+
+&&
+	<<
+		NLA = ANDAND;
+	>>
+
+\|
+	<<
+		NLA = OR;
+	>>
+
+^
+	<<
+		NLA = XOR;
+	>>
+
+&
+	<<
+		NLA = AND;
+	>>
+
+==
+	<<
+		NLA = EQ;
+	>>
+
+!=
+	<<
+		NLA = NE;
+	>>
+
+?\<
+	<<
+		NLA = MIN;
+	>>
+
+?\>
+	<<
+		NLA = MAX;
+	>>
+
+\<
+	<<
+		NLA = LT;
+	>>
+
+\>
+	<<
+		NLA = GT;
+	>>
+
+\<=
+	<<
+		NLA = LE;
+	>>
+
+\>=
+	<<
+		NLA = GE;
+	>>
+
+\>\>
+	<<
+		NLA = SHR;
+	>>
+
+\<\<
+	<<
+		NLA = SHL;
+	>>
+
+\+
+	<<
+		NLA = ADD;
+	>>
+
+\-
+	<<
+		NLA = SUB;
+	>>
+
+\*
+	<<
+		NLA = MUL;
+	>>
+
+/
+	<<
+		NLA = DIV;
+	>>
+
+\%
+	<<
+		NLA = MOD;
+	>>
+
+\(
+	<<
+		NLA = LPAREN;
+	>>
+
+\)
+	<<
+		NLA = RPAREN;
+	>>
+
+\~
+	<<
+		NLA = NOT;
+	>>
+
+!
+	<<
+		NLA = LNOT;
+	>>
+
+,
+	<<
+		NLA = COMMA;
+	>>
+
+=
+	<<
+		NLA = ASSIGN;
+	>>
+
+?\<=
+	<<
+		NLA = ASMIN;
+	>>
+
+?\>=
+	<<
+		NLA = ASMAX;
+	>>
+
+\|\|=
+	<<
+		NLA = ASOROR;
+	>>
+
+&&=
+	<<
+		NLA = ASANDAND;
+	>>
+
+\+=
+	<<
+		NLA = ASADD;
+	>>
+
+\-=
+	<<
+		NLA = ASSUB;
+	>>
+
+\*=
+	<<
+		NLA = ASMUL;
+	>>
+
+/=
+	<<
+		NLA = ASDIV;
+	>>
+
+\%=
+	<<
+		NLA = ASMOD;
+	>>
+
+\>\>=
+	<<
+		NLA = ASSHR;
+	>>
+
+\<\<=
+	<<
+		NLA = ASSHL;
+	>>
+
+&=
+	<<
+		NLA = ASAND;
+	>>
+
+^=
+	<<
+		NLA = ASXOR;
+	>>
+
+\|=
+	<<
+		NLA = ASOR;
+	>>
+
+\+\+
+	<<
+		NLA = ADDADD;
+	>>
+
+\-\-
+	<<
+		NLA = SUBSUB;
+	>>
+
+\.
+	<<
+		NLA = DOT;
+	>>
+
+.equate
+	<<
+		NLA = EQU;
+	>>
+
+.set
+	<<
+		NLA = SET;
+	>>
+
+.origin
+	<<
+		NLA = ORG;
+	>>
+
+.if
+	<<
+		NLA = IF;
+	>>
+
+.ifref
+	<<
+		NLA = IFREF;
+	>>
+
+.else
+	<<
+		NLA = ELSE;
+	>>
+
+.end
+	<<
+		NLA = END;
+	>>
+
+.word
+	<<
+		NLA = DW;
+	>>
+
+.space
+	<<
+		NLA = DS;
+	>>
+
+.alias
+	<<
+		NLA = ALIAS;
+	>>
+
+.const
+	<<
+		NLA = CONST;
+	>>
+
+.align
+	<<
+		NLA = ALIGN;
+	>>
+
+.error
+	<<
+		NLA = ERROR;
+	>>
+
+.warn
+	<<
+		NLA = WARN;
+	>>
+
+.segment
+	<<
+		NLA = SEGMENT;
+	>>
+
+{\.}[a-zA-Z_][a-zA-Z_0-9]*
+	<<
+		NLA = WORD;
+    {
+      register int i = findsym(zzbegexpr);
+      if (i != -1) {
+        NLA = typofsym(i);
+      }
+    }   
+	>>
+
+\$
+	<<
+		NLA = 87;
+	>>
+
+\#
+	<<
+		NLA = 88;
+	>>
+
+\[
+	<<
+		NLA = 89;
+	>>
+
+\]
+	<<
+		NLA = 90;
+	>>
+
+\@
+	<<
+		NLA = 91;
+	>>
+
+
+%%LEXSTRING
+
+@
+	<<
+		NLA = MYEOF;
+	>>
+
+~[\'\\]
+	<<
+		NLA = NUM;
+    { char buf[1024];
+      sprintf(buf, "0x%x", *(zzbegexpr));
+      zzreplstr(buf); }
+	>>
+
+\\~[]
+	<<
+		NLA = NUM;
+    { char buf[1024];
+      sprintf(buf, "0x%x", *(zzbegexpr+1));
+      zzreplstr(buf); }
+	>>
+
+\'
+	<<
+		NLA = 81;
+    zzreplstr(""); zzmode(START); zzmore();   
+	>>
+
+
+%%LEXMESG
+
+@
+	<<
+		NLA = MYEOF;
+	>>
+
+~[\"\\]
+	<<
+		NLA = 82;
+    zzmore();   
+	>>
+
+\\~[]
+	<<
+		NLA = 83;
+    zzmore();   
+	>>
+
+\"
+	<<
+		NLA = MESG;
+    zzreplstr(""); zzmode(START);   
+	>>
+
+%%

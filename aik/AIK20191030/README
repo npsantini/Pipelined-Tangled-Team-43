@@ -1,0 +1,30 @@
+For 20191030 version:
+
+On Linux, building should be as simple as typing "make" in this directory.
+
+Note that AIK uses PCCTS, which is now a rather old maintenance release, so
+it's included as source in the pccts directory here.  PCCTS is rebuilt as part
+of the AIK make process.
+
+AIK itself was written by Prof. Henry Dietz in support of the EE480 course in
+the Department of Electrical and Computer Engineering at the University of
+Kentucky, and is made freely available as Public Domain source code without
+any use restrictions... nor any guarantees, nor does the author accept any
+liability for any applications of AIK. For documentation and further
+information, including a link to the CGI version online, see:
+
+http://aggregate.org/AIK/
+
+The documentation for AIK should be referenced something like:
+
+@techreport{AIK,
+author={H. G. Dietz and W. R. Dieter},
+title=({AIK, the Assembler Interpreter from Kentucky}},
+institution={University of Kentucky},
+month={April},
+year={2007},
+howpublished={Aggregate.Org online technical report},
+url={http://aggregate.org/AIK/aik.pdf}
+}
+
+Contact information for Henry (Hank) Dietz is at http://aggregate.org/hankd
