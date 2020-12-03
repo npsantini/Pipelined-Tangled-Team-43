@@ -1,24 +1,3 @@
-/*
-* 
-*      Authors: Cain Hubbard, Collin Lebanik, Nick Satini, Tristan Barnes
-*         File: tangled.v
-*      Project: Assignment 3 - "Pipelined Tangled"
-*      Created: 5 November 2020
-* 
-*  Description: Implements a Pipelined Tangled Processor design.
-*           
-*/
-
-
-
-// The following macros should be set using the -D flag when invoking iverilog
-// from the command line in order to specify testbench text and data vmem files
-// and the name of the output vcd file. 
-//`define TEST_TEXT_VMEM      "set/using/the/-D/flag/on/cmdline/test.text.vmem"
-//`define TEST_DATA_VMEM      "set/using/the/-D/flag/on/cmdline/test.text.vmem"
-//`define TEST_VCD            "set/using/the/-D/flag/on/cmdline/test.vcd"
-
-
 
 // ROM used by the frecip Floaty module.
 `define FRECIP_LOOKUP_VMEM  "src/frecipLookup.vmem"
