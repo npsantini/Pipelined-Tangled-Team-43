@@ -484,7 +484,7 @@ module Tangled (
 
     function isQat;
         input `WORD_SIZE instr;
-        isQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD == `FB_FIELD_F4);
+        isQat = (instr `FA_FIELD == `FA_FIELD_F1to4) && (instr `FB_FIELD >= `FB_FIELD_F4);
     endfunction
 
     always @(posedge clk) begin

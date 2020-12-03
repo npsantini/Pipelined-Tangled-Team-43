@@ -5,7 +5,7 @@ TEST_TASMS = $(shell ls $(TESTING_DIR)/*.tasm)
 TEST_SIM_OUTPUT_EXTS = .vcd .text.vmem .data.vmem .vvp .vvp.log
 
 DESIGN_DIR = ./src
-DESIGN_FILE = $(DESIGN_DIR)/tangled.v
+DESIGN_FILE = $(DESIGN_DIR)/tangledQat.v
 DESIGN_SOURCES = $(shell find $(DESIGN_DIR) -type f)
 
 TASM_SPEC = $(TESTING_DIR)/tangled.aik
